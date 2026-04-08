@@ -1,0 +1,147 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv(r"C:\Users\nehaj\Downloads\Salesdata.csv")
+
+# Keep a clean copy
+df_clean = df.copy()
+
+# ---------------- PREPROCESSING ----------------
+def preprocessing():
+    global df_clean
+    print("\n--- Preprocessing ---")
+
+    # Remove duplicates
+    print("\nDuplicate Rows:\n", df_clean[df_clean.duplicated()])
+    df_clean = df_clean.drop_duplicates()
+
+    # Handle missing values
+    df_clean["UnitPrice"] = pd.to_numeric(df_clean["UnitPrice"], errors='coerce')
+    df_clean["UnitPrice"].fillna(df_clean["UnitPrice"].mean(), inplace=True)
+    df_clean["Region"].fillna("Unknown", inplace=True)
+
+    print("\nDataset after cleaning:\n", df_clean.head())
+
+
+# ---------------- SORTING & FILTERING ----------------
+def sorting_filtering():
+    print("\n--- Sorting & Filtering ---")
+
+    sorted_data = df_clean.sort_values("UnitPrice")
+    print("\nSorted by UnitPrice:\n", sorted_data.head())
+
+    north_orders = df_clean[df_clean["Region"] == "North"]
+    print("\nOrders where Region is North:\n", north_orders)
+
+
+# ---------------- INDEXING & SLICING ----------------
+def indexing_slicing():
+    print("\n--- Indexing & Slicing ---")
+
+    print("\nProduct and Category columns:\n", df_clean[["Product", "Category"]].head())
+    print("\nRows 5 to 10:\n", df_clean.iloc[5:11])
+
+
+# ---------------- PIVOT TABLES ----------------
+def pivot_tables():
+    print("\n--- Pivot Tables ---")
+
+    sales_region = df_clean.pivot_table(
+        values="TotalSales",
+        index="Region",
+        aggfunc="sum"
+    )
+
+    print("\nTotal Sales by Region:\n", sales_region)
+
+    avg_price_category = df_clean.pivot_table(
+        values="UnitPrice",
+        index="Category",
+        aggfunc="mean"
+    )
+
+    print("\nAverage UnitPrice by Category:\n", avg_price_category)
+
+
+# ---------------- NUMPY ANALYSIS ----------------
+def numpy_analysis():
+    print("\n--- NumPy Statistical Analysis ---")
+
+    df_np = df_clean[["Quantity", "UnitPrice", "TotalSales"]].to_numpy()
+
+    print("Total Revenue:", df_np[:, 2].sum())
+    print("Average UnitPrice:", df_np[:, 1].mean())
+    print("Highest TotalSales:", df_np[:, 2].max())
+    print("Lowest UnitPrice:", df_np[:, 1].min())
+
+
+# ---------------- DATA VISUALIZATION ----------------
+def data_visualization():
+    print("\n--- Data Visualization ---")
+
+    # Total Sales by Region
+    sales_by_region = df_clean.groupby("Region")["TotalSales"].sum()
+
+    sales_by_region.plot(kind="bar")
+    plt.title("Total Sales by Region")
+    plt.xlabel("Region")
+    plt.ylabel("Total Sales")
+    plt.show()
+
+    # Average UnitPrice by Category
+    avg_price_category = df_clean.groupby("Category")["UnitPrice"].mean()
+
+    avg_price_category.plot(kind="bar")
+    plt.title("Average Unit Price by Category")
+    plt.xlabel("Category")
+    plt.ylabel("Average Price")
+    plt.show()
+
+
+# ---------------- MAIN MENU ----------------
+def main_menu():
+
+    while True:
+
+        print("\n===== Sales Data Analysis Menu =====")
+        print("1. Data Preprocessing")
+        print("2. Sorting & Filtering")
+        print("3. Indexing & Slicing")
+        print("4. Pivot Tables")
+        print("5. NumPy Statistical Analysis")
+        print("6. Data Visualization")
+        print("7. Exit")
+
+        choice = input("Enter your choice (1-7): ")
+
+        if choice == "1":
+            preprocessing()
+
+        elif choice == "2":
+            sorting_filtering()
+
+        elif choice == "3":
+            indexing_slicing()
+
+        elif choice == "4":
+            pivot_tables()
+
+        elif choice == "5":
+            numpy_analysis()
+
+        elif choice == "6":
+            data_visualization()
+
+        elif choice == "7":
+            print("Exiting program. Goodbye!")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
+
+
+# Run Program
+if __name__ == "__main__":
+    main_menu()
